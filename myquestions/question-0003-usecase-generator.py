@@ -3,7 +3,7 @@ from sklearn.linear_model import ElasticNet
 from sklearn.feature_selection import VarianceThreshold
 from sklearn.metrics import mean_squared_error, r2_score
 
-def generar_caso_entrenar_elasticnet():
+def generar_caso_de_uso_entrenar_elasticnet():
     rng = np.random.default_rng()
     n = int(rng.integers(50, 100))
     n_features = int(rng.integers(8, 15))
