@@ -28,7 +28,7 @@ def generar_caso_de_uso_filtrar_canciones():
     ]
     return input_dict, output
 
-inp, out = generar_caso_filtrar_canciones()
+inp, out = generar_caso_de_uso_filtrar_canciones()
 print("=== Base de datos original ===")
 print(inp["df"].to_string(index=False))
 print(f"\nmin_reproducciones={inp['min_reproducciones']}, "
