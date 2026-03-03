@@ -27,7 +27,7 @@ def generar_caso_de_uso_entrenar_elasticnet():
     }
     return input_dict, output
 
-inp1, out1 = generar_caso_entrenar_elasticnet()
+inp1, out1 = generar_caso_de_uso_entrenar_elasticnet()
 print("=== Input ===")
 print(f"X shape: {inp1['X'].shape}")
 print(f"umbral_varianza: {inp1['umbral_varianza']}")
