@@ -30,7 +30,7 @@ def generar_caso_de_uso_predecir_bayesiano():
     }
     return input_dict, output
 
-inp2, out2 = generar_caso_predecir_bayesiano()
+inp2, out2 = generar_caso_de_uso_predecir_bayesiano()
 print("\n\n=== Input ===")
 print(f"X_cat (primeras 5):\n{inp2['X_cat'][:5]}")
 print(f"X_num shape: {inp2['X_num'].shape}")
