@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-def generar_caso_filtrar_canciones():
+def generar_caso_de_uso_filtrar_canciones():
     rng = np.random.default_rng()
     n = int(rng.integers(10, 25))
     canciones = [f"cancion_{i}" for i in range(n)]
