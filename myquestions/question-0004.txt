@@ -1,0 +1,28 @@
+===========================================================
+ EJERCICIO 4
+ ===========================================================
+ Contexto:
+ Trabajas en el área de recursos humanos de una empresa de logística.
+ El dataset contiene información de empleados: nivel de experiencia
+ ("junior", "semi-senior", "senior"), área de trabajo y otras
+ variables numéricas como horas trabajadas y proyectos completados.
+ Quieres predecir el salario anual de cada empleado.
+ El nivel de experiencia es una variable ordinal: tiene un orden
+ natural (junior < semi-senior < senior) que debe respetarse al
+ codificarla. Usar OrdinalEncoder garantiza que el modelo entienda
+ esa jerarquía. BayesianRidge es ideal porque incorpora
+ incertidumbre en los coeficientes, útil cuando los datos son
+ escasos o ruidosos.
+
+ Tu Misión:
+ Escribe la función predecir_bayesiano(X_cat, X_num, y, categorias)
+ que:
+ 1. Codifique X_cat con OrdinalEncoder(categories=categorias)
+    para respetar el orden correcto de las categorías.
+ 2. Concatene horizontalmente X_cat codificada con X_num
+    usando np.hstack.
+ 3. Entrene un BayesianRidge sobre los datos concatenados.
+ 4. Retorne un diccionario con:
+    - "r2"        : coeficiente de determinación sobre datos de entrenamiento
+    - "coef"      : array de coeficientes del modelo redondeado a 4 decimales
+    - "n_features": número total de features usadas
