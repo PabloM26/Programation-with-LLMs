@@ -1,0 +1,26 @@
+===========================================================
+ EJERCICIO 3
+ ===========================================================
+ Contexto:
+ Eres científico de datos en una empresa farmacéutica que analiza
+ compuestos químicos para descubrir nuevos medicamentos. El dataset
+ tiene cientos de variables moleculares, pero muchas de ellas son
+ casi constantes entre todos los compuestos (poca varianza), lo que
+ significa que no aportan información útil al modelo y solo añaden
+ ruido. Antes de entrenar, necesitas eliminar esas variables
+ automáticamente y luego ajustar un modelo de regresión que prediga
+ la actividad biológica del compuesto (IC50).
+ ElasticNet es ideal aquí porque combina regularización L1 y L2,
+ seleccionando variables relevantes y evitando sobreajuste.
+
+ Tu Misión:
+ Escribe la función entrenar_elasticnet(X, y, umbral_varianza) que:
+ 1. Elimine las columnas de X cuya varianza sea menor a
+    `umbral_varianza` usando VarianceThreshold de sklearn.
+ 2. Entrene un modelo ElasticNet(random_state=42) sobre los datos
+    filtrados.
+ 3. Retorne un diccionario con:
+    - "n_features_originales"   : número de columnas originales
+    - "n_features_seleccionadas": número de columnas tras el filtro
+    - "mse": error cuadrático medio sobre los datos de entrenamiento
+    - "r2" : coeficiente de determinación sobre los datos de entrenamiento
