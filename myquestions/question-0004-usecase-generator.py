@@ -3,7 +3,7 @@ from sklearn.preprocessing import OrdinalEncoder
 from sklearn.linear_model import BayesianRidge
 from sklearn.metrics import r2_score
 
-def generar_caso_predecir_bayesiano():
+def generar_caso_de_uso_predecir_bayesiano():
     rng = np.random.default_rng()
     n = int(rng.integers(40, 80))
     niveles = ["junior", "semi-senior", "senior"]
