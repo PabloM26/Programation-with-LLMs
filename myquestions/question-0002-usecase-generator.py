@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-def generar_caso_imputar_temperatura():
+def generar_caso_de_uso_imputar_temperatura():
     rng = np.random.default_rng()
     n = int(rng.integers(8, 20))
     fechas = pd.date_range("2024-01-01", periods=n, freq="h")
