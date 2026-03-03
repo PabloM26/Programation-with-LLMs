@@ -15,7 +15,7 @@
 
  Tu Misión:
  Escribe la función imputar_temperatura(df, col) que:
- 1. Reciba un DataFrame con columnas 'timestamp' y `col` (temperatura).
+ 1. Reciba un DataFrame con columnas 'timestamp' y col (por ejemplo: 'temperatura').
  2. Para cada NaN en `col`, lo reemplace con el promedio entre
     el valor no-NaN más cercano hacia atrás y el más cercano
     hacia adelante.
