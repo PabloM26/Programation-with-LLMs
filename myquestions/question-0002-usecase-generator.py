@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+
 def generar_caso_de_uso_imputar_temperatura():
     rng = np.random.default_rng()
     n = int(rng.integers(8, 20))
