@@ -20,7 +20,7 @@ def generar_caso_de_uso_imputar_temperatura():
     df_out["temperatura"] = y
     return input_dict, df_out
 
-inp3, out3 = generar_caso_imputar_temperatura()
+inp3, out3 = generar_caso_de_uso_imputar_temperatura()
 print("\n\n=== DataFrame de sensores (con NaN) ===")
 print(inp3["df"].to_string(index=False))
 print("\n=== Output esperado ===")
