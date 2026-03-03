@@ -1,0 +1,22 @@
+==========================================================
+
+ EJERCICIO 2
+
+ ==========================================================
+
+ Contexto:
+ Trabajas en una planta de manufactura que monitorea la temperatura
+ de sus hornos industriales cada hora. Los sensores a veces fallan
+ y dejan registros vacíos (NaN). Un NaN no puede simplemente
+ ignorarse ni rellenarse con un promedio global, ya que la
+ temperatura cambia gradualmente: lo más preciso es estimar
+ el valor faltante como el promedio entre la última lectura
+ válida anterior y la siguiente lectura válida posterior.
+
+ Tu Misión:
+ Escribe la función imputar_temperatura(df, col) que:
+ 1. Reciba un DataFrame con columnas 'timestamp' y `col` (temperatura).
+ 2. Para cada NaN en `col`, lo reemplace con el promedio entre
+    el valor no-NaN más cercano hacia atrás y el más cercano
+    hacia adelante.
+ 3. Retorne el DataFrame completo con los NaN reemplazados
