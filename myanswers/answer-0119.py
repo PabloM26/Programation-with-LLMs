@@ -50,7 +50,10 @@ def generar_caso_de_uso_preparar_datos3():
     output_obj = stacking_clf
     
     return input_dict, output_obj
-
+# Ejemplo de uso:
+# input_data, expected_stacking = generar_caso_de_uso_preparar_datos()
+# print(f"Modelo entrenado con {input_data['X'].shape[0]} registros.")
+# print(f"Estimadores base incluidos: {list(expected_stacking.named_estimators_.keys())}")
 def construir_ensamble_stacking(X, y):
     # 1. Definir los modelos base (Nivel 0)
     base_estimators = [
