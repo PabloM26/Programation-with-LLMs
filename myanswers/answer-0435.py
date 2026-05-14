@@ -9,7 +9,7 @@ from sklearn.decomposition import PCA
 # FASE 1 - PASO 2: GENERADOR DE CASOS DE USO
 # =====================================================
 
-def generar_caso_de_uso_data_drift():
+def generar_caso_de_uso_data_drift(**kwargs):
     """
     Genera un caso de prueba aleatorio para la función detectar_data_drift
     """
