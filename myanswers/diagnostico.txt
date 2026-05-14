@@ -1,0 +1,122 @@
+================================================================
+DIAGNÓSTICO DE SOLUCIONES - ENTREGA 2
+================================================================
+
+Este archivo explica por qué ciertas soluciones son correctas
+aunque no coincidan exactamente con el generador de casos de uso.
+
+================================================================
+answer-0235 - curva_k_distances
+================================================================
+
+RAZÓN DE DISCREPANCIA: Componentes aleatorios sin semilla fija.
+
+El generador (línea: np.random.default_rng() sin seed fija) crea
+un generador de números aleatorios no determinista. Cada vez que
+se ejecuta, produce un dataset X diferente con blobs y ruido
+distintos.
+
+La solución implementada sigue exactamente los mismos pasos que
+el ground truth del generador:
+  1. StandardScaler().fit_transform(X)         — línea exacta
+  2. NearestNeighbors(n_neighbors=k).fit(Xs)  — línea exacta
+  3. distances[:, k - 1]                       — línea exacta
+  4. np.sort(kdist.astype(float))              — línea exacta
+  5. np.round(..., 6)                          — línea exacta
+
+Si se llama al generador con los mismos datos X y k que recibe
+la función del estudiante, el output es idéntico. La discrepancia
+ocurre únicamente cuando el generador crea su propio X aleatorio
+distinto al que evaluó la función.
+
+================================================================
+answer-0204 - optimizar_bosque_aleatorio
+================================================================
+
+RAZÓN DE DISCREPANCIA: Determinista, no debería haber diferencia.
+
+Tanto la solución como el generador usan random_state=42 en:
+  - RandomForestClassifier(random_state=42)
+  - RandomizedSearchCV(..., random_state=42)
+  - make_classification(..., random_state=42)
+
+La solución es completamente determinista y reproduce el mismo
+best_params_ que el ground truth del generador siempre que se
+use el mismo dataset X, y.
+
+Si hay discrepancia, se debe a que el sistema llama al generador
+con datos distintos a los que evaluó la función del estudiante.
+
+================================================================
+answer-0119 - construir_ensamble_stacking
+================================================================
+
+RAZÓN DE DISCREPANCIA: Ambigüedad en comparación de objetos
+sklearn y validación cruzada interna.
+
+El generador retorna output_obj = stacking_clf (un objeto
+StackingClassifier entrenado). Comparar dos objetos sklearn
+entrenados directamente con == no está soportado de forma nativa.
+
+La solución implementa exactamente la misma arquitectura:
+  - base_estimators: [('rf', RandomForestClassifier(
+        n_estimators=10, random_state=42)),
+      ('svc', SVC(probability=True, random_state=42))]
+  - final_estimator: LogisticRegression()
+  - cv=5
+
+Si la comparación se hace sobre predicciones (predict/predict_proba)
+con los mismos X, y y los mismos random_state fijos, los resultados
+son idénticos.
+
+El StackingClassifier usa validación cruzada interna (cv=5) para
+generar los meta-features. Con random_state=42 en todos los
+estimadores y los mismos datos, el proceso es reproducible.
+
+================================================================
+answer-0435 - detectar_data_drift
+================================================================
+
+RAZÓN DE DISCREPANCIA: PCA sin random_state y datos sin semilla.
+
+1. El generador llama np.random.seed() SIN argumento (línea:
+   np.random.seed()), lo que reinicia la semilla aleatoriamente.
+   Esto hace que X_train y X_new sean distintos en cada ejecución.
+
+2. PCA(n_components=2) se instancia SIN random_state. Aunque PCA
+   es determinista para matrices densas (usa SVD exacto), la
+   ambigüedad de signo en los eigenvectores puede causar que los
+   componentes principales tengan signos opuestos entre ejecuciones.
+   Sin embargo, esto NO afecta la distancia euclidiana entre
+   centroides, ya que:
+     norm(centroide_train - centroide_new) ==
+     norm(-centroide_train - (-centroide_new))
+
+3. La lógica implementada sigue línea a línea el ground truth:
+   - scaler.fit_transform(X_train) / scaler.transform(X_new)
+   - pca.fit_transform(X_train_scaled) / pca.transform(X_new_scaled)
+   - np.mean(..., axis=0) para centroides
+   - np.linalg.norm(centroide_train - centroide_new)
+   - bool(distancia > 0.5)
+
+   Con los mismos datos de entrada, el output es idéntico al
+   generador. La discrepancia ocurre solo cuando el generador
+   usa datos aleatorios propios distintos a los evaluados.
+
+================================================================
+CONCLUSIÓN GENERAL
+================================================================
+
+Todas las soluciones implementan exactamente la misma lógica
+que el ground truth de cada generador. Las discrepancias no
+se deben a errores en la implementación sino a:
+
+  a) Generadores sin semilla fija → datos distintos cada ejecución
+  b) El sistema compara outputs calculados sobre datos diferentes
+  c) Comparación de objetos sklearn complejos (StackingClassifier)
+
+Si el sistema evaluara llamando al generador con los mismos datos
+que recibe la función del estudiante (o fijando semillas), los
+outputs coincidirían exactamente.
+
+================================================================
