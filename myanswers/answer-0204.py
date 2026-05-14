@@ -3,7 +3,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.datasets import make_classification
 
-def generar_caso_de_uso_optimizar_bosque_aleatorio():
+def generar_caso_de_uso_optimizar_bosque_aleatorio(**kwargs):
 
     X, y = make_classification(n_samples=100, n_features=4, random_state=42)
     
