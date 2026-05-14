@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import NearestNeighbors
 
-def generar_caso_de_uso_curva_k_distances(**kwargs):
+def generar_caso_de_uso_curva_k_distances():
     """
     Genera un caso de uso aleatorio (input/output esperado)
     para curva_k_distances(X, k=5)
