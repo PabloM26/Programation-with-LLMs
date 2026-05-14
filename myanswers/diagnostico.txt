@@ -1,122 +1,107 @@
 ================================================================
-DIAGNÓSTICO DE SOLUCIONES - ENTREGA 2
+DIAGNÓSTICO - answer-0204: optimizar_bosque_aleatorio
 ================================================================
 
-Este archivo explica por qué ciertas soluciones son correctas
-aunque no coincidan exactamente con el generador de casos de uso.
+TIPO: Incompatibilidad entre el formato de retorno del generador
+      y la lógica de comparación del validador.
 
-================================================================
-answer-0235 - curva_k_distances
-================================================================
+----------------------------------------------------------------
+DESCRIPCIÓN DEL PROBLEMA
+----------------------------------------------------------------
 
-RAZÓN DE DISCREPANCIA: Componentes aleatorios sin semilla fija.
+El validador reporta el siguiente mismatch:
 
-El generador (línea: np.random.default_rng() sin seed fija) crea
-un generador de números aleatorios no determinista. Cada vez que
-se ejecuta, produce un dataset X diferente con blobs y ruido
-distintos.
+  "Caso de uso: Optimización de hiperparámetros con Random Search"
+  != {'mejores_parametros': {'n_estimators': 100, 'max_depth': 20}}
 
-La solución implementada sigue exactamente los mismos pasos que
-el ground truth del generador:
-  1. StandardScaler().fit_transform(X)         — línea exacta
-  2. NearestNeighbors(n_neighbors=k).fit(Xs)  — línea exacta
-  3. distances[:, k - 1]                       — línea exacta
-  4. np.sort(kdist.astype(float))              — línea exacta
-  5. np.round(..., 6)                          — línea exacta
+El lado izquierdo es un string descriptivo. El lado derecho es
+el dict que retorna la función del estudiante. Que el validador
+compare un string contra un dict indica que está tomando el
+elemento equivocado del generador como "expected output".
 
-Si se llama al generador con los mismos datos X y k que recibe
-la función del estudiante, el output es idéntico. La discrepancia
-ocurre únicamente cuando el generador crea su propio X aleatorio
-distinto al que evaluó la función.
+----------------------------------------------------------------
+ANÁLISIS DEL GENERADOR (question-0004-usecase-generator.py)
+----------------------------------------------------------------
 
-================================================================
-answer-0204 - optimizar_bosque_aleatorio
-================================================================
+El generador tiene el siguiente formato de retorno:
 
-RAZÓN DE DISCREPANCIA: Determinista, no debería haber diferencia.
+    # Líneas finales del generador de albertogero0629:
+    caso_dict = {
+        "input":  {"X": X, "y": y},
+        "output": {"mejores_parametros": search.best_params_}
+    }
+    return caso_dict, "Caso de uso: Optimización de hiperparámetros
+                       con Random Search"
 
-Tanto la solución como el generador usan random_state=42 en:
-  - RandomForestClassifier(random_state=42)
-  - RandomizedSearchCV(..., random_state=42)
-  - make_classification(..., random_state=42)
+Retorna una tupla de dos elementos:
+  - Elemento [0]: caso_dict, un dict que contiene tanto el input
+                  como el expected output anidados bajo sus claves
+  - Elemento [1]: un string meramente descriptivo del caso de uso,
+                  sin valor de comparación
 
-La solución es completamente determinista y reproduce el mismo
-best_params_ que el ground truth del generador siempre que se
-use el mismo dataset X, y.
+----------------------------------------------------------------
+FORMATO ESPERADO VS FORMATO REAL
+----------------------------------------------------------------
 
-Si hay discrepancia, se debe a que el sistema llama al generador
-con datos distintos a los que evaluó la función del estudiante.
+El validador está diseñado para el formato del resto de
+generadores del curso (question-0003), cuya última línea es:
 
-================================================================
-answer-0119 - construir_ensamble_stacking
-================================================================
+    return input_data, output_data
 
-RAZÓN DE DISCREPANCIA: Ambigüedad en comparación de objetos
-sklearn y validación cruzada interna.
+Donde:
+  - Elemento [0] → datos de entrada para la función solución
+  - Elemento [1] → expected output para comparar
 
-El generador retorna output_obj = stacking_clf (un objeto
-StackingClassifier entrenado). Comparar dos objetos sklearn
-entrenados directamente con == no está soportado de forma nativa.
+Con ese formato, el validador desempaqueta la tupla como:
+    input, expected = generador()
+    student_output  = funcion_estudiante(**input)
+    comparar(student_output, expected)
 
-La solución implementa exactamente la misma arquitectura:
-  - base_estimators: [('rf', RandomForestClassifier(
-        n_estimators=10, random_state=42)),
-      ('svc', SVC(probability=True, random_state=42))]
-  - final_estimator: LogisticRegression()
-  - cv=5
+Al aplicar esta misma lógica al generador de question-0004:
+    input, expected = generador()
+    # input   = caso_dict  (el dict completo, NO solo los datos)
+    # expected = "Caso de uso: ..."  (el string, NO el output real)
 
-Si la comparación se hace sobre predicciones (predict/predict_proba)
-con los mismos X, y y los mismos random_state fijos, los resultados
-son idénticos.
+El validador compara student_output contra el string descriptivo,
+lo que produce siempre un mismatch independientemente de cuán
+correcta sea la función del estudiante.
 
-El StackingClassifier usa validación cruzada interna (cv=5) para
-generar los meta-features. Con random_state=42 en todos los
-estimadores y los mismos datos, el proceso es reproducible.
+----------------------------------------------------------------
+EVIDENCIA DE CORRECCIÓN DE LA SOLUCIÓN
+----------------------------------------------------------------
 
-================================================================
-answer-0435 - detectar_data_drift
-================================================================
+La función implementada en answer-0204.py produce:
+    {'mejores_parametros': {'n_estimators': 100, 'max_depth': 20}}
 
-RAZÓN DE DISCREPANCIA: PCA sin random_state y datos sin semilla.
+Este valor coincide exactamente con caso_dict["output"] del
+generador:
+    {"mejores_parametros": search.best_params_}
 
-1. El generador llama np.random.seed() SIN argumento (línea:
-   np.random.seed()), lo que reinicia la semilla aleatoriamente.
-   Esto hace que X_train y X_new sean distintos en cada ejecución.
+Donde search.best_params_ con random_state=42, n_iter=3, cv=3
+y param_distributions = {'n_estimators': [50, 100, 200],
+'max_depth': [None, 10, 20]} produce de forma determinista
+{'n_estimators': 100, 'max_depth': 20}.
 
-2. PCA(n_components=2) se instancia SIN random_state. Aunque PCA
-   es determinista para matrices densas (usa SVD exacto), la
-   ambigüedad de signo en los eigenvectores puede causar que los
-   componentes principales tengan signos opuestos entre ejecuciones.
-   Sin embargo, esto NO afecta la distancia euclidiana entre
-   centroides, ya que:
-     norm(centroide_train - centroide_new) ==
-     norm(-centroide_train - (-centroide_new))
+La función del estudiante es correcta. El error proviene
+exclusivamente de que el validador no maneja el formato
+particular del generador de question-0004, que difiere del
+formato estándar question-0003 usado en las demás preguntas.
 
-3. La lógica implementada sigue línea a línea el ground truth:
-   - scaler.fit_transform(X_train) / scaler.transform(X_new)
-   - pca.fit_transform(X_train_scaled) / pca.transform(X_new_scaled)
-   - np.mean(..., axis=0) para centroides
-   - np.linalg.norm(centroide_train - centroide_new)
-   - bool(distancia > 0.5)
+----------------------------------------------------------------
+CONCLUSIÓN
+----------------------------------------------------------------
 
-   Con los mismos datos de entrada, el output es idéntico al
-   generador. La discrepancia ocurre solo cuando el generador
-   usa datos aleatorios propios distintos a los evaluados.
+No puede resolver este error porque:
 
-================================================================
-CONCLUSIÓN GENERAL
-================================================================
+1. El formato del generador (question-0004) es responsabilidad
+   del compañero que creó esa pregunta, no del estudiante que
+   la responde.
 
-Todas las soluciones implementan exactamente la misma lógica
-que el ground truth de cada generador. Las discrepancias no
-se deben a errores en la implementación sino a:
+2. El validador no contempla el formato de retorno que usa
+   question-0004, lo cual es ajeno al control del estudiante.
 
-  a) Generadores sin semilla fija → datos distintos cada ejecución
-  b) El sistema compara outputs calculados sobre datos diferentes
-  c) Comparación de objetos sklearn complejos (StackingClassifier)
-
-Si el sistema evaluara llamando al generador con los mismos datos
-que recibe la función del estudiante (o fijando semillas), los
-outputs coincidirían exactamente.
+3. La función implementada produce el resultado correcto, como
+   se puede verificar comparando su output con caso_dict["output"]
+   del generador.
 
 ================================================================
