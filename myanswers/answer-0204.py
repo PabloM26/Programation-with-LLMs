@@ -1,7 +1,5 @@
-import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import RandomizedSearchCV
-from sklearn.datasets import make_classification
 
 def optimizar_bosque_aleatorio(X, y):
     # 1. Instanciar el modelo base
