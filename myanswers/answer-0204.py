@@ -1,8 +1,14 @@
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import RandomizedSearchCV
 
-def optimizar_bosque_aleatorio(X, y):
-    # 1. Instanciar el modelo base
+def optimizar_bosque_aleatorio(**kwargs):
+    # El generador pasa los datos como input={"X":..., "y":...}
+    if "input" in kwargs:
+        X = kwargs["input"]["X"]
+        y = kwargs["input"]["y"]
+    else:
+        X = kwargs["X"]
+        y = kwargs["y"]
     rf = RandomForestClassifier(random_state=42)
 
     # 2. Definir el espacio de búsqueda
