@@ -20,12 +20,11 @@ compare un string contra un dict indica que está tomando el
 elemento equivocado del generador como "expected output".
 
 ----------------------------------------------------------------
-ANÁLISIS DEL GENERADOR (question-0004-usecase-generator.py)
+ANÁLISIS DEL GENERADOR 
 ----------------------------------------------------------------
 
 El generador tiene el siguiente formato de retorno:
 
-    # Líneas finales del generador de albertogero0629:
     caso_dict = {
         "input":  {"X": X, "y": y},
         "output": {"mejores_parametros": search.best_params_}
@@ -40,37 +39,23 @@ Retorna una tupla de dos elementos:
                   sin valor de comparación
 
 ----------------------------------------------------------------
-FORMATO ESPERADO VS FORMATO REAL
+SITUACIÓN DEL CASO
 ----------------------------------------------------------------
 
-El validador está diseñado para el formato del resto de
-generadores del curso (question-0003), cuya última línea es:
-
-    return input_data, output_data
-
-Donde:
-  - Elemento [0] → datos de entrada para la función solución
-  - Elemento [1] → expected output para comparar
-
-Con ese formato, el validador desempaqueta la tupla como:
-    input, expected = generador()
-    student_output  = funcion_estudiante(**input)
-    comparar(student_output, expected)
-
-Al aplicar esta misma lógica al generador de question-0004:
+Al revisar el generador de question-0004:
     input, expected = generador()
     # input   = caso_dict  (el dict completo, NO solo los datos)
     # expected = "Caso de uso: ..."  (el string, NO el output real)
 
 El validador compara student_output contra el string descriptivo,
-lo que produce siempre un mismatch independientemente de cuán
-correcta sea la función del estudiante.
+lo que produce siempre un mismatch independientemente de si es
+correcta la función diseñada.
 
 ----------------------------------------------------------------
 EVIDENCIA DE CORRECCIÓN DE LA SOLUCIÓN
 ----------------------------------------------------------------
 
-La función implementada en answer-0204.py produce:
+La función implementada produce:
     {'mejores_parametros': {'n_estimators': 100, 'max_depth': 20}}
 
 Este valor coincide exactamente con caso_dict["output"] del
@@ -85,20 +70,19 @@ y param_distributions = {'n_estimators': [50, 100, 200],
 La función del estudiante es correcta. El error proviene
 exclusivamente de que el validador no maneja el formato
 particular del generador de question-0004, que difiere del
-formato estándar question-0003 usado en las demás preguntas.
+formato estándar en las demás preguntas.
 
 ----------------------------------------------------------------
 CONCLUSIÓN
 ----------------------------------------------------------------
 
-No puede resolver este error porque:
+No se puede resolver este error porque:
 
 1. El formato del generador (question-0004) es responsabilidad
-   del compañero que creó esa pregunta, no del estudiante que
-   la responde.
+   del compañero que creó esa pregunta.
 
 2. El validador no contempla el formato de retorno que usa
-   question-0004, lo cual es ajeno al control del estudiante.
+   question-0004.
 
 3. La función implementada produce el resultado correcto, como
    se puede verificar comparando su output con caso_dict["output"]
